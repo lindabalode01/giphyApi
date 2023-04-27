@@ -36,4 +36,25 @@ public function __construct()
     }
     return $collection;
 }
+PUBLIC FUNCTION searchGifs(STRING $searchWord, INT $limit):ARRAY
+{
+    $response = $this->client->get('api.giphy.com/v1/gifs/search', [
+        'query' => [
+            'api_key' => $_ENV['API_KEY'],
+            'Q' => $searchWord,
+            'limit' => $limit,
+            'offset' => floor(rand(0, 499))
+        ]
+    ]);
+    $giphyData = json_decode($response->getBody()->getContents());
+    $foundGifs = [];
+    foreach ($giphyData->data as $gif)
+    {
+        $foundGifs[] = new Giphy(
+            $gif->title,
+            $gif->images->fixed_width->url
+        );
+    }
+    return $foundGifs;
+}
 }
